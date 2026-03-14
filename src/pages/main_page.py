@@ -57,7 +57,6 @@ def _show_sankey(t: TaxResult):
     source = [f[0] for f in flussi_attivi]
     target = [f[1] for f in flussi_attivi]
     value  = [f[2] for f in flussi_attivi]  # normalized here, not scattered across each line
-    # openrouter api: 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
     fig = go.Figure(data=[go.Sankey(
         node=dict(
             pad=20,
