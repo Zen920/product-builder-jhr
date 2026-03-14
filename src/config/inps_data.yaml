@@ -1,0 +1,66 @@
+yaml:
+  esonero:
+    - detrazione: 0.07
+      soglia: 1923
+    - detrazione: 0.06
+      soglia: 2692
+  tassazione_irpef:
+    anno_riferimento: 2026
+    scaglioni:
+      - nome: "PrimaFascia"
+        min: 0
+        max: 28000
+        aliquota: 0.23
+      - nome: "SecondaFascia"
+        min: 28001
+        max: 50000
+        aliquota: 0.33
+      - nome: "TerzaFascia"
+        min: 50001
+        max: -1  # 'null' indica che non c'è un limite superiore (oltre i 50k)
+        aliquota: 0.43
+  detrazioni:
+    - fascia: 1
+      min: 0
+      max: 15000
+      base: 1955
+    - fascia: 2
+      min: 15000
+      max: 28000
+      base: 1910
+      incremento: 1190
+      increment_op: "sum"
+      denominatore: 13000
+    - fascia: 3
+      min: 28000
+      max: 50000
+      base: 1910
+      incremento: 1
+      increment_op: "multiply"
+      denominatore: 22000
+  cuneo_fiscale:
+    - fascia: 1
+      min: 0
+      max: 8500
+      percentage_benefit: 0.071
+    - fascia: 2
+      min: 8501
+      max: 15000
+      percentage_benefit: 0.053
+    - fascia: 3
+      min: 15001
+      max: 20000
+      percentage_benefit: 0.048
+    - fascia: 4
+      min: 20001
+      max: 32000
+      flat_benefit: 1000
+    - fascia: 5
+      min: 32001
+      max: 40000
+      flat_benefit: 1000
+      diminishing_factor: 0.125
+  contributi_dipendente:
+    aliquota_base: 0.0919
+    aliquota_solidarieta: 0.1019
+    soglia_solidarieta: 56000
