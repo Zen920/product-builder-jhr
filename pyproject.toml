@@ -7,6 +7,9 @@ dependencies = ["pandas", "streamlit", "pyyaml", "pydantic", "plotly", "pytest"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 
+[tool.setuptools.package-data]
+project_builder_jhr = ["data/**/*"]
+
 [project.scripts]
 init-app = "project_builder_jhr.scripts.setup:main"
 

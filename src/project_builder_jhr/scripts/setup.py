@@ -19,17 +19,26 @@ from project_builder_jhr.helpers.utils import (
 
 logger = logging.getLogger(__name__)
 
+PACKAGE_DIR   = Path(__file__).parent.parent  # → site-packages/project_builder_jhr/
+RESOURCES_DIR = PACKAGE_DIR / "data" / "raw"          # raw files inside the package
+CLEANED_DIR   = Path.cwd() / "resources" / "cleaned"  # → user's working directory
+
+RAW_ADDREG       = RESOURCES_DIR / "addreg2026.csv"
+RAW_COMUNI       = RESOURCES_DIR / "Elenco-comuni-italiani.csv"
+RAW_ADD_COMUNALE = RESOURCES_DIR / "Add_comunale_irpef2025.csv"
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 
-RESOURCES_DIR = Path("resources")
+"""RESOURCES_DIR = Path("resources")
 CLEANED_DIR   = RESOURCES_DIR / "cleaned"
+"""
 LOGS_DIR   = Path(get_project_root()) / "logs"
 # Raw sources
-RAW_ADDREG         = "addreg2026.csv"
+"""RAW_ADDREG         = "addreg2026.csv"
 RAW_COMUNI         = "Elenco-comuni-italiani.csv"
 RAW_ADD_COMUNALE   = "Add_comunale_irpef2025.csv"
+"""
 
 # Cleaned outputs
 OUT_ADDREG  = CLEANED_DIR / "addizionali_regionali.csv"
