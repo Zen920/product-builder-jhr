@@ -2,7 +2,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import MagicMock
-from src.project_builder_jhr.services.tax import calculate_net_from_ral
+from project_builder_jhr.services.tax import calculate_net_from_ral
 
 
 # ---------------------------------------------------------------------------
