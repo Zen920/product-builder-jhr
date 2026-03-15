@@ -19,15 +19,12 @@ class TaxResult:
     imposta_netta: float
     netto: float 
     netto_mensile: float
-    """@property
-    def netto_mensile(self, months: int = 13) -> float:
-        return self.netto / months"""
  
     def log_summary(self) -> None:  
         logger.info(
             "Tax calculation summary | RAL=%.2f | INPS=%.2f | cuneo=%.2f | "
             "imponibile=%.2f | IRPEF=%.2f | det.=%.2f | add.reg=%.2f | "
-            "add.com=%.2f | imposta_netta=%.2f | netto=%.2f",
+            "add.com=%.2f | imposta_netta=%.2f | netto=%.2f"
             "netto mensile=%.2f",
             self.ral,
             self.contributo_inps,
