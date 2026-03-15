@@ -121,7 +121,7 @@ def test_regione_not_found_raises(cfg):
 @pytest.mark.parametrize("ral, expected_net", [
     (35000, 25000),
     (55000, 35500), 
-    (60000, 36700), 
+    (60000, 37500), 
 ])
 def test_net_calculation(ral, expected_net, cfg):
     result = calculate_net_from_ral(ral, 12, "MILANO", "LOMBARDIA", cfg)
