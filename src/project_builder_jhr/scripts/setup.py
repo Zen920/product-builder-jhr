@@ -6,8 +6,8 @@ the raw sources in resources/.
 
 import logging
 from pathlib import Path
-from src.helpers.utils import get_project_root
-from src.helpers.utils import (
+from src.project_builder_jhr.helpers.utils import get_project_root
+from src.project_builder_jhr.helpers.utils import (
     clean_csv_file,
     normalize_csv_file,
     import_region_name,

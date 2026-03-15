@@ -2,7 +2,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import MagicMock
-from src.services.tax import calculate_net_from_ral
+from src.project_builder_jhr.services.tax import calculate_net_from_ral
 
 
 # ---------------------------------------------------------------------------
@@ -114,3 +114,16 @@ def test_regione_not_found_raises(cfg):
     with pytest.raises(KeyError, match="UNKNOWN_REGIONE"):
         calculate_net_from_ral(40000, 12, "ROMA", "UNKNOWN_REGIONE", cfg)
 
+# ---------------------------------------------------------------------------
+# Valid net calculation
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("ral, expected_net", [
+    (35000, 25000),
+    (55000, 35500), 
+    (60000, 36700), 
+])
+def test_net_calculation(ral, expected_net, cfg):
+    result = calculate_net_from_ral(ral, 12, "MILANO", "LOMBARDIA", cfg)
+    imponibile = result.imponibile_fiscale
+    assert result.netto == pytest.approx(expected_net, rel=2e-2)

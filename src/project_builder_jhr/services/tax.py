@@ -1,8 +1,8 @@
 import re
-from src.models.inps_model import Scaglioni, Detrazioni
-from src.models.tax import Bracket, TaxResult
+from src.project_builder_jhr.models.inps_model import Scaglioni, Detrazioni
+from src.project_builder_jhr.models.tax import Bracket, TaxResult
 from functools import cache
-from src.config.config import config_class as _default_config
+from src.project_builder_jhr.config.config import config_class as _default_config
 import pandas as pd
 import logging.config
 logger = logging.getLogger("src.services.tax")

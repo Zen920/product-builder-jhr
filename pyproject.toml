@@ -1,2 +1,19 @@
+[project]
+requires-python = ">= 3.13"
+name = 'project-builder-jhr'
+version = "0.1"
+dependencies = ["pandas", "streamlit", "pyyaml", "pydantic", "plotly", "pytest"]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[project.scripts]
+init-app = "project_builder_jhr.scripts.setup:main"
+
+[build-system]
+requires = ["setuptools >= 77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

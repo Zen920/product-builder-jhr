@@ -101,12 +101,12 @@ REGION_NAME_OVERRIDES = {
 
 def get_project_root() -> Path:
     """Return the absolute path to the project root (two levels above this file)."""
-    return Path(__file__).absolute().parent.parent.parent
+    return Path(__file__).absolute().parent.parent.parent.parent
 
 
 def get_config_path(config_filename: str) -> Path:
     """Build the full path to a config file under src/config/."""
-    return get_project_root() / "src" / "config" / config_filename
+    return get_project_root() / "src" / "project_builder_jhr" / "config" / config_filename
 
 
 def get_resources_path(filename: str) -> Path:

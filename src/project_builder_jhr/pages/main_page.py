@@ -1,7 +1,7 @@
 import streamlit as st
-from src.models.tax import TaxResult
-from src.services.tax import calculate_net_from_ral
-from src.config.config import config_class as _default_config
+from src.project_builder_jhr.models.tax import TaxResult
+from src.project_builder_jhr.services.tax import calculate_net_from_ral
+from src.project_builder_jhr.config.config import config_class as _default_config
 from functools import cache
 import plotly.graph_objects as go
 
