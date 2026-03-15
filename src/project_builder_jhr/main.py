@@ -7,8 +7,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 def main():
-    #show_main_page()
-    calculate_net_from_ral(35000, 14, "MILANO", "LOMBARDIA")
+    show_main_page()
 if __name__ == '__main__':
     
     main()
