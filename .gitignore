@@ -19,7 +19,7 @@ env/
 *.conda
 
 # Generated / cleaned data (rebuild via setup.py)
-resources/cleaned/
+#resources/cleaned/ Required for streamlit_cloud
 
 # Environment variables
 .env
