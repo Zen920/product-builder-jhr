@@ -98,7 +98,7 @@ def setup_elenco_comuni() -> None:
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def run_setup() -> None:
+def main() -> None:
     """
     Ensure resources/cleaned/ exists and all required cleaned files are present.
     Call this once before instantiating ConfigClass.
@@ -115,4 +115,4 @@ def run_setup() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    run_setup()
+    main()
