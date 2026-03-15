@@ -39,32 +39,3 @@ class TaxResult:
             self.netto_mensile
         )
     
-@dataclass(frozen=True, slots=True)
-class Bracket:
-    """A single income bracket with its associated flat rate."""
-    low:  float
-    high: float   # 0.0 means open-ended (no upper bound)
-    rate: float   # already divided by 100
-
-    @property
-    def is_open_ended(self) -> bool:
-        return self.low == 0.0 and self.high == 0.0
-
-    @property
-    def width(self) -> float:
-        return abs(self.high - self.low)
-    
-    def calcola_addizionale(self, imponibile, remaining_imponibile) -> tuple[float,float]:
-        addizionale = 0
-        if imponibile > self.high:
-            if self.low == 0 and self.high == 0:
-                addizionale += remaining_imponibile*self.rate
-                remaining_imponibile = 0
-            else:
-                addizionale +=self.width*self.rate
-                remaining_imponibile -= self.width
-        else:
-            #aliquota_comunale += abs(b.width-remaining_imponibile)*b.rate
-            addizionale += remaining_imponibile*self.rate
-            remaining_imponibile = 0
-        return addizionale, remaining_imponibile

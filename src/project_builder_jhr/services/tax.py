@@ -1,6 +1,6 @@
 import re
-from project_builder_jhr.models.inps_model import Scaglioni, Detrazioni
-from project_builder_jhr.models.tax import Bracket, TaxResult
+from project_builder_jhr.models.inps_model import Bracket, Detrazioni
+from project_builder_jhr.models.tax import TaxResult
 from functools import cache
 from project_builder_jhr.config.config import config_class as _default_config
 import pandas as pd
@@ -17,21 +17,27 @@ _BRACKET_RE = re.compile(
     r'((?:oltre [ A-Za-z,.]|(?:da euro [ A-Za-z,.]))*(?P<min_value>[0-9.,]+))'
     r'|(?:fino a [ A-Za-z,.]*(?P<max_value>[0-9.,]+))'
 )
-def _calcola_irpef(scaglioni: list[Scaglioni], ral):
+def _calcola_irpef(brackets: list[Bracket], imponibile):
     contributo_lavoratore : float = 0
-    remaining_ral = ral
-    for scaglione in scaglioni:
-        if ral > scaglione.min and (ral <= scaglione.max or scaglione.max == -1):
-            contributo_lavoratore+=remaining_ral*scaglione.aliquota
-            remaining_ral -= scaglione.max-scaglione.min
+    remaining_imponibile = imponibile
+    for b in brackets:
+        addizionale, remaining_imponibile = b.calcola_addizionale(imponibile=imponibile, remaining_imponibile=remaining_imponibile)
+        contributo_lavoratore+=addizionale
+        if remaining_imponibile <= 0:
             break
-        elif ral > scaglione.max:
-            contributo_lavoratore+=abs(scaglione.max-scaglione.min)*scaglione.aliquota
-            remaining_ral -= abs(scaglione.max-scaglione.min)
     return contributo_lavoratore
+    """for scaglione in scaglioni:
+        if ral > scaglione.low and (ral <= scaglione.high or scaglione.high == -1):
+            contributo_lavoratore+=remaining_ral*scaglione.rate
+            remaining_ral -= scaglione.high-scaglione.low
+            break
+        elif ral > scaglione.high:
+            contributo_lavoratore+=abs(scaglione.high-scaglione.low)*scaglione.rate
+            remaining_ral -= abs(scaglione.high-scaglione.low)"""
+    #return contributo_lavoratore
 
 def _calcola_detrazioni(detrazioni: list[Detrazioni], ral):
-    detrazione =  next((detrazione for detrazione in detrazioni if ral <= detrazione.max), None)
+    detrazione =  next((detrazione for detrazione in detrazioni if ral <= detrazione.high), None)
     return detrazione.calcolo_detrazioni(ral) if detrazione else 0
 
 def _aliquota_percentage_parser(aliquota: str):
@@ -204,7 +210,7 @@ def _calcola_addizionale_regionale(ser: pd.Series, imponibile: float) -> float:
 
     return _apply_brackets(brackets, imponibile)
 def calcolo_cuneo_fiscale(ral, cuneo_fiscale):
-    fascia_cuneo = next((f for f in cuneo_fiscale if f.min <= ral <= f.max), None)
+    fascia_cuneo = next((f for f in cuneo_fiscale if f.low <= ral <= f.high), None)
     if fascia_cuneo:
         return fascia_cuneo.calcolo_cuneo_fiscale(ral)
     return 0

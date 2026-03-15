@@ -52,7 +52,12 @@ def _build_logger_config(log_path: Path) -> dict:
             },
         "handlers": handlers,
         "loggers": {
-            "": { "level": "DEBUG", "handlers": ["queue"] }
+            "": { "level": "INFO", "handlers": ["queue"] },
+            "watchdog": {  # silence watchdog specifically
+                "level": "WARNING",
+                "handlers": [],
+                "propagate": False
+            }
         }
     }
     
