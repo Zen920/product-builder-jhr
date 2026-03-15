@@ -1,0 +1,12 @@
+from project_builder_jhr.logger import setup_logging
+import logging.config
+from project_builder_jhr.pages.main_page import show_main_page
+
+setup_logging()
+logger = logging.getLogger(__name__)
+
+def main():
+    show_main_page()
+
+if __name__ == '__main__':
+    main()

@@ -32,14 +32,16 @@ REGION_NAME_OVERRIDES = {
 # Path helpers
 # ---------------------------------------------------------------------------
 
+PACKAGE_DIR = Path(__file__).absolute().parent.parent
+
 def get_project_root() -> Path:
-    """Return the absolute path to the project root (two levels above this file)."""
-    return Path(__file__).absolute().parent.parent.parent.parent
+    """Return the absolute path to the project root (four levels above this file)."""
+    return PACKAGE_DIR.parent.parent
 
 
 def get_config_path(config_filename: str) -> Path:
-    """Build the full path to a config file under src/config/."""
-    return get_project_root() / "src" / "project_builder_jhr" / "config" / config_filename
+    """Build the full path to a config file inside the package."""
+    return PACKAGE_DIR / "config" / config_filename
 
 
 def get_resources_path(filename: str) -> Path:

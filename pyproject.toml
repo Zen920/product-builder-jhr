@@ -8,10 +8,11 @@ dependencies = ["pandas", "streamlit", "pyyaml", "pydantic", "plotly", "pytest"]
 pythonpath = ["."]
 
 [tool.setuptools.package-data]
-project_builder_jhr = ["data/**/*"]
+project_builder_jhr = ["data/**/*", "config/*.yaml"]
 
 [project.scripts]
 init-app = "project_builder_jhr.scripts.setup:main"
+start-app = "project_builder_jhr.main:main"
 
 [build-system]
 requires = ["setuptools >= 77.0.3", "wheel"]

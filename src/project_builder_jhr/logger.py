@@ -1,7 +1,7 @@
 import atexit
 import logging.config
 
-from src.helpers.utils import get_project_root
+from project_builder_jhr.helpers.utils import get_project_root
 
 project_root = get_project_root()
 
