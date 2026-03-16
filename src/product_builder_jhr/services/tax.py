@@ -1,7 +1,7 @@
-from project_builder_jhr.models.inps_model import Detrazioni, CuneoFiscale
-from project_builder_jhr.models.tax import TaxResult
-from project_builder_jhr.config.config import config_class as _default_config
-from project_builder_jhr.helpers.brackets import build_brackets, apply_brackets
+from product_builder_jhr.models.inps_model import Detrazioni, CuneoFiscale
+from product_builder_jhr.models.tax import TaxResult
+from product_builder_jhr.config.config import config_class as _default_config
+from product_builder_jhr.helpers.brackets import build_brackets, apply_brackets
 from decimal import Decimal
 import pandas as pd
 import logging.config

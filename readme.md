@@ -12,7 +12,7 @@
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/you/product-builder-jhr.git
+git clone https://github.com/zen920/product-builder-jhr.git
 cd product-builder-jhr
 ```
 
@@ -34,7 +34,7 @@ python -m pip install .
 ### 4. Run the first-launch setup
 
 ```bash
-python -m project_builder_jhr.scripts.setup
+python -m product_builder_jhr.scripts.setup
 ```
 
 This will generate the required resources and configuration files.
@@ -46,7 +46,7 @@ This will generate the required resources and configuration files.
 ```
 product-builder-jhr/
 ├── src/
-│   └── project_builder_jhr/
+│   └── product_builder_jhr/
 │       ├── config/
 │       │   └── inps_data.yaml
 │       ├── helpers/
@@ -67,7 +67,7 @@ product-builder-jhr/
 ## Running the App
 
 ```bash
-streamlit run src/project_builder_jhr/pages/main.py
+streamlit run src/product_builder_jhr/pages/main.py
 ```
 
 ---
@@ -84,32 +84,4 @@ python -m pip install -e .
 
 ```bash
 python -m pytest tests/ -v
-```
-
----
-
-## Troubleshooting
-
-**`python` resolves to the wrong installation**
-
-If you have multiple Python installations (e.g. via scoop), always use `python -m pip` instead of `pip` directly. You can verify which Python is active with:
-
-```bash
-python -c "import sys; print(sys.executable)"
-```
-
-It should point to your conda environment, e.g.:
-```
-C:\Users\<you>\miniconda3\envs\ProductBuilderJHR\python.exe
-```
-
-**`ModuleNotFoundError` when importing**
-
-Never use `src.` in imports. Always import directly by package name:
-```python
-# correct
-from project_builder_jhr.services.tax import calculate_net_from_ral
-
-# wrong
-from src.project_builder_jhr.services.tax import calculate_net_from_ral
 ```

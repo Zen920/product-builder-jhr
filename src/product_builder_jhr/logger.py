@@ -1,7 +1,7 @@
 import atexit
 import logging.config
 import os
-from project_builder_jhr.helpers.utils import get_project_root
+from product_builder_jhr.helpers.utils import get_project_root
 from pathlib import Path
 
 project_root = get_project_root()

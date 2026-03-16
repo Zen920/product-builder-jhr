@@ -2,8 +2,8 @@
 import pytest
 import pandas as pd
 from unittest.mock import MagicMock
-from project_builder_jhr.services.tax import calcolo_cuneo_fiscale
-from project_builder_jhr.models.inps_model import CuneoFiscale
+from product_builder_jhr.services.tax import calcolo_cuneo_fiscale
+from product_builder_jhr.models.inps_model import CuneoFiscale
 from decimal import Decimal
 
 # ---------------------------------------------------------------------------

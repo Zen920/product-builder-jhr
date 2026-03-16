@@ -1,5 +1,5 @@
-from project_builder_jhr.models.inps_model import Dati
-from project_builder_jhr.helpers.utils import load_yaml_config, read_csv
+from product_builder_jhr.models.inps_model import Dati
+from product_builder_jhr.helpers.utils import load_yaml_config, read_csv
 class ConfigClass():
     def __init__(self, config):
         self.yaml_file = load_yaml_config(config)

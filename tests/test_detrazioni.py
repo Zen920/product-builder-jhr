@@ -1,8 +1,8 @@
 import pytest
 import pandas as pd
 from unittest.mock import MagicMock
-from project_builder_jhr.services.tax import calculate_net_from_ral, calcola_detrazioni
-from project_builder_jhr.models.inps_model import Detrazioni
+from product_builder_jhr.services.tax import calculate_net_from_ral, calcola_detrazioni
+from product_builder_jhr.models.inps_model import Detrazioni
 from decimal import Decimal
 # ---------------------------------------------------------------------------
 # Detrazioni overlap

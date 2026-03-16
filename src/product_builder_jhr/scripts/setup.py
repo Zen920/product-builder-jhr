@@ -6,8 +6,8 @@ the raw sources in resources/.
 
 import logging
 from pathlib import Path
-from project_builder_jhr.helpers.utils import get_project_root
-from project_builder_jhr.helpers.utils import (
+from product_builder_jhr.helpers.utils import get_project_root
+from product_builder_jhr.helpers.utils import (
     clean_csv_file,
     normalize_csv_file,
     import_region_name,
@@ -19,7 +19,7 @@ from project_builder_jhr.helpers.utils import (
 
 logger = logging.getLogger(__name__)
 
-PACKAGE_DIR   = Path(__file__).parent.parent  # → site-packages/project_builder_jhr/
+PACKAGE_DIR   = Path(__file__).parent.parent  # → site-packages/product_builder_jhr/
 RESOURCES_DIR = PACKAGE_DIR / "data" / "raw"          # raw files inside the package
 CLEANED_DIR   = Path.cwd() / "resources" / "cleaned"  # → user's working directory
 

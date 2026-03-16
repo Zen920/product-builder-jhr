@@ -1,6 +1,6 @@
 import pandas as pd
-from project_builder_jhr.helpers.parsers import sanitize_values, parse_brackets_range
-from project_builder_jhr.models.inps_model import Bracket
+from product_builder_jhr.helpers.parsers import sanitize_values, parse_brackets_range
+from product_builder_jhr.models.inps_model import Bracket
 import logging.config
 from decimal import Decimal
 logger = logging.getLogger("helpers.brackets")
