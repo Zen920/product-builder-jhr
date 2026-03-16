@@ -5,9 +5,10 @@ from product_builder_jhr.services.tax import calculate_net_from_ral
 import streamlit as st
 setup_logging()
 logger = logging.getLogger(__name__)
+st.set_page_config(layout="wide")
 
 def main():
-    st.set_page_config(layout="wide")
-    show_main_page()
+    pg = st.navigation([st.Page(show_main_page, title="ProductBuilderJHR")], position="hidden")
+    pg.run()
 if __name__ == '__main__':
     main()
