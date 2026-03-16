@@ -26,7 +26,6 @@ conda activate ProductBuilderJHR
 ### 3. Install the package
 
 > **Important:** Use `python -m pip` instead of `pip` directly to ensure the correct Python environment is used.
-
 ```bash
 python -m pip install .
 ```
@@ -66,8 +65,10 @@ product-builder-jhr/
 
 ## Running the App
 
+> **Important:** Run from the main directory of the project (the one created via clone).
+
 ```bash
-streamlit run src/product_builder_jhr/pages/main.py
+streamlit run "src/product_builder_jhr/pages/main.py"
 ```
 
 ---
