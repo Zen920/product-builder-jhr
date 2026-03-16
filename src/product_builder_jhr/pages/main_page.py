@@ -87,7 +87,6 @@ def _show_sankey(t: TaxResult):
 
     st.plotly_chart(fig, width='content')
 def show_main_page():
-    st.set_page_config(layout="wide")
     ral = st.text_input("RAL", key="ral", value='35000')
     selectbox_mesi = st.selectbox("Mesi", [12,13,14], index=0, placeholder="Scegli il numero di mensilità...")
     selectbox_regione = st.selectbox(

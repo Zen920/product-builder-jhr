@@ -2,11 +2,12 @@ from product_builder_jhr.logger import setup_logging
 import logging.config
 from product_builder_jhr.pages.main_page import show_main_page
 from product_builder_jhr.services.tax import calculate_net_from_ral
-from decimal import Decimal
+import streamlit as st
 setup_logging()
 logger = logging.getLogger(__name__)
 
 def main():
+    st.set_page_config(layout="wide")
     show_main_page()
 if __name__ == '__main__':
     main()
