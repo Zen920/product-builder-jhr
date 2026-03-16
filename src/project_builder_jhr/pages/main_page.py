@@ -3,20 +3,21 @@ from project_builder_jhr.models.tax import TaxResult
 from project_builder_jhr.services.tax import calculate_net_from_ral
 from project_builder_jhr.config.config import config_class as _default_config
 from functools import cache
+from decimal import Decimal
 import plotly.graph_objects as go
 
 def _show_sankey(t: TaxResult):
     # msg - x coord - y coord - color - value
     nodi_config = {
     "ral":(f"RAL: {t.ral:.0f}€", 0.0, 0.4,"#2c3e50", t.ral),
-    "cuneo":(f"Cuneo: {t.cuneo:.0f}€", 0.02, 0.0, "#2ecc71", t.cuneo),
+    "cuneo":(f"Cuneo fiscale: {t.cuneo:.0f}€", 0.0, 0.0, "#2ecc71", t.cuneo),
     "inps":(f"INPS: {t.contributo_inps:.0f}€", 0.25, 0.9, "#FF0000", t.contributo_inps),
-    "imponibile":(f"Imponibile: {t.imponibile_fiscale:.0f}€", 0.25, 0.4,  "#e67e22", t.imponibile_fiscale),
+    "imponibile":(f"Imponibile fiscale: {t.imponibile_fiscale:.0f}€", 0.25, 0.4,  "#e67e22", t.imponibile_fiscale),
     "irpef":(f"IRPEF Lorda: {t.irpef:.0f}€", 0.55, 0.7,"#e67e22", t.irpef),      # 4: Sotto imponibile
     "addizionale_comunale":(f"Add. Comunale: {t.addizionale_comunale:.0f}€", 0.57, 0.9,"#e67e22", t.addizionale_comunale),
     "addizionale_regionale":(f"Add. Regionale: {t.addizionale_regionale:.0f}€", 0.59, 0.98,"#e67e22", t.addizionale_regionale),
     "imposta_lorda":(f"Imposta Lorda: {t.imposta_lorda:.0f}€", 0.70, 0.85,  "#e67e22",t.imposta_lorda),
-    "detrazioni":(f"Detrazioni: {t.detrazioni:.0f}€", 0.75, 0.6,  "#2ecc71", t.detrazioni),
+    "detrazioni":(f"Detrazioni lavoro dipendente : {t.detrazioni:.0f}€", 0.75, 0.6,  "#2ecc71", t.detrazioni),
     "imposta_netta":(f"Imposta Netta: {t.imposta_netta:.0f}€", 0.85, 0.95,  "#FF0000", t.imposta_netta),
     "netto":(f"Netto annuale: {t.netto:.0f}€", 0.85, 0.2, "#2ecc71", t.netto),
     "netto_mensile":(f"Netto mensile: {t.netto_mensile:.0f}€", 0.95, 0.5, "#2ecc71", t.netto_mensile)
@@ -87,8 +88,8 @@ def _show_sankey(t: TaxResult):
     st.plotly_chart(fig, width='content')
 def show_main_page():
     st.set_page_config(layout="wide")
-    ral = st.text_input("RAL", key="ral", value=35000)
-    mesi = st.selectbox("Mesi", [12,13,14], index=0, placeholder="Scegli il numero di mensilità...")
+    ral = st.text_input("RAL", key="ral", value='35000')
+    selectbox_mesi = st.selectbox("Mesi", [12,13,14], index=0, placeholder="Scegli il numero di mensilità...")
     selectbox_regione = st.selectbox(
         'Regione di residenza',
         (_default_config.addizionali_regionali.index.drop_duplicates()), index=None, placeholder="Scegli la regione di residenza..."
@@ -99,8 +100,8 @@ def show_main_page():
         comuni, placeholder = 'Scegli il comune di residenza...', index=None, disabled=False if selectbox_regione else True
     )
 
-    submitted = st.button("Conferma", disabled=False if selectbox_regione and selectbox_comune else True)
+    submitted = st.button("Calcola", disabled=False if selectbox_regione and selectbox_comune else True)
     if submitted:    
-        tax_result = calculate_net_from_ral(float(ral), 14, selectbox_comune, selectbox_regione, mesi)
+        tax_result = calculate_net_from_ral(Decimal(ral), selectbox_comune, selectbox_regione, selectbox_mesi)
         st.metric(label="Netto Annuale", value=f"€ {tax_result.netto:,.0f}")
         _show_sankey(tax_result)

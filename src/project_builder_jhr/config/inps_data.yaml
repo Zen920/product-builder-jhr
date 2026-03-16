@@ -20,46 +20,40 @@ yaml:
         high: 0  # 'null' indica che non c'è un limite superiore (oltre i 50k)
         rate: 0.43
   detrazioni:
-    - fascia: 1
-      low: 0
+    - low: 0
       high: 15000
       base: 1955
-    - fascia: 2
-      low: 15000
+    - low: 15000
       high: 28000
       base: 1910
-      incremento: 1190
+      increment: 1190
       increment_op: "sum"
-      denominatore: 13000
-    - fascia: 3
-      low: 28000
+    - low: 28000
       high: 50000
       base: 1910
-      incremento: 1
+      increment: 1
       increment_op: "multiply"
-      denominatore: 22000
+    - base: 65
+      low: 25000
+      high: 35000
+      increment_op: "sum"
   cuneo_fiscale:
-    - fascia: 1
-      low: 0
+    - low: 0
       high: 8500
       rate: 0.071
-    - fascia: 2
-      low: 8501
+    - low: 8500
       high: 15000
       rate: 0.053
-    - fascia: 3
-      low: 15001
+    - low: 15000
       high: 20000
       rate: 0.048
-    - fascia: 4
-      low: 20001
+    - low: 20000
       high: 32000
       flat_benefit: 1000
-    - fascia: 5
-      low: 32001
+    - low: 32000
       high: 40000
       flat_benefit: 1000
-      diminishing_factor: 0.125
+      reduction_rate: 0.125
   contributi_dipendente:
     aliquota_base: 0.0919
     aliquota_solidarieta: 0.1019

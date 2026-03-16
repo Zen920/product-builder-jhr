@@ -1,239 +1,76 @@
-import re
-from project_builder_jhr.models.inps_model import Bracket, Detrazioni
+from project_builder_jhr.models.inps_model import Detrazioni, CuneoFiscale
 from project_builder_jhr.models.tax import TaxResult
-from functools import cache
 from project_builder_jhr.config.config import config_class as _default_config
+from project_builder_jhr.helpers.brackets import build_brackets, apply_brackets
+from decimal import Decimal
 import pandas as pd
 import logging.config
 logger = logging.getLogger("src.services.tax")
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
- 
-_SANITIZE_RE = re.compile(
-    r'(,(?=[0-9]*[^,]$))|([.](?=[0-9]{1,3}[.|,]))'
-)
-_BRACKET_RE = re.compile(
-    r'((?:oltre [ A-Za-z,.]|(?:da euro [ A-Za-z,.]))*(?P<min_value>[0-9.,]+))'
-    r'|(?:fino a [ A-Za-z,.]*(?P<max_value>[0-9.,]+))'
-)
-def _calcola_irpef(brackets: list[Bracket], imponibile):
-    contributo_lavoratore : float = 0
-    remaining_imponibile = imponibile
-    for b in brackets:
-        addizionale, remaining_imponibile = b.calcola_addizionale(imponibile=imponibile, remaining_imponibile=remaining_imponibile)
-        contributo_lavoratore+=addizionale
-        if remaining_imponibile <= 0:
-            break
-    return contributo_lavoratore
-    """for scaglione in scaglioni:
-        if ral > scaglione.low and (ral <= scaglione.high or scaglione.high == -1):
-            contributo_lavoratore+=remaining_ral*scaglione.rate
-            remaining_ral -= scaglione.high-scaglione.low
-            break
-        elif ral > scaglione.high:
-            contributo_lavoratore+=abs(scaglione.high-scaglione.low)*scaglione.rate
-            remaining_ral -= abs(scaglione.high-scaglione.low)"""
-    #return contributo_lavoratore
 
-def _calcola_detrazioni(detrazioni: list[Detrazioni], ral):
-    detrazione =  next((detrazione for detrazione in detrazioni if ral <= detrazione.high), None)
-    return detrazione.calcolo_detrazioni(ral) if detrazione else 0
+def calcola_detrazioni(detrazioni: list[Detrazioni], ral: Decimal) -> Decimal:
+    """Calculate tax detractions.
 
-def _aliquota_percentage_parser(aliquota: str):
-    return float(aliquota.replace(",","."))/100
-def _aliquota_comunale_cleaner(v: str) -> float:
-    return float(v.replace('.', '').replace(',','.'))
-
-def _format_decimals(match):
-    char = match.group(0)
-    return '.' if char  == ',' else '' 
-def _parse_brackets_range(text: str):
+        Args:
+            detrazioni: Lista delle detrazioni presenti (lavoro dipendente)
+            ral: Valore della ral
+        Returns:
+            Decimal: Valore lordo delle detrazioni per lavoro dipendente 
     """
-    Extract (low, high) bounds from a bracket description string.
- 
-    Returns (0.0, 0.0) when the pattern is not found (open-ended bracket).
-    """
-    m = _BRACKET_RE.finditer(text)
-    if not m:
-        return 0.0, 0.0
-    results = {}
-    for match in m:
-        results.update({k: v for k, v in match.groupdict().items() if v is not None})
-    else:
-        return sanitize_values(results.get('min_value', '0')), sanitize_values(results.get('max_value', '0'))
-@cache
-def sanitize_values(value) -> float:
-    if type(value) == float or type(value) != str:
-        return value
-    if not value or value == '0*':
-        return 0.0
-    return float(_SANITIZE_RE.sub(_format_decimals, value))
-def _create_brackets(ser):
-    raw_brackets: list[str] = []
-    raw_rates: list[float] = []
-    
-    for col in ser.index:
-        if col.startswith('FASCIA'):
-            raw_brackets.append(str(ser[col]))
-        elif col.startswith('ALIQUOTA'):
-            raw_rates.append(sanitize_values(ser[col]))
-    if len(raw_brackets) != len(raw_rates):
-        if len(raw_rates) == 1 and raw_rates[0] == 0.0 and len(raw_brackets) == 0:
-            return ['0.00', '0.00'], raw_rates
-        raise ValueError(
-            f"Mismatched FASCIA/ALIQUOTA columns: "
-            f"{len(raw_brackets)} brackets vs {len(raw_rates)} rates"
-        )
-    return raw_brackets, raw_rates
-def _build_brackets(ser: pd.Series, divide_rate_by: float = 100.0) -> tuple[Bracket, ...]:
-    """Build a list of Bracket objects from a filtered Series."""
-    raw_brackets, raw_rates = _create_brackets(ser)
-    return list(
-        Bracket(low=low, high=high, rate=rate / divide_rate_by)
-        for (low, high), rate in zip(map(_parse_brackets_range, raw_brackets), raw_rates)
+    return sum(
+        d.calcolo_detrazioni(ral)
+        for d in detrazioni
+        if d.low < ral <= d.high
     )
-def _calcola_nel_bracket():
-    for b in brackets:
-        if imponibile > b.high:
-            if b.low == 0 and b.high == 0:
-                aliquota_comunale += remaining_imponibile*b.rate
-                break 
-            aliquota_comunale +=b.width*b.rate
-            remaining_imponibile -= b.width
-        else:
-            #aliquota_comunale += abs(b.width-remaining_imponibile)*b.rate
-            aliquota_comunale += remaining_imponibile*b.rate
-            break
-    return aliquota_comunale
-def _calcola_addizionale_comunale(ser, imponibile):
-    filtered = ser.filter(regex=r'^FASCIA|ALIQUOTA(_[0-9]+)*')
-    esenzione_raw = float(sanitize_values(ser.get('IMPORTO_ESENTE', None)))
-    try:
-        esenzione = float(esenzione_raw) if esenzione_raw is not None else None
-    except (ValueError, TypeError):
-        logger.warning("Could not parse IMPORTO_ESENTE value: %r", esenzione_raw)
-        esenzione = None
-    #raw_brackets, raw_rates = _create_brackets(filtered)
-    brackets = _build_brackets(filtered, 100)
-    """brackets = list(
-        Bracket(low=low, high=high, rate=rate / 100)
-        for (low, high), rate in zip(
-            map(_parse_brackets_range, raw_brackets), raw_rates
-        )
-    )"""
-    discovered_esenzione = next(((index, b.high) for index, b in enumerate(brackets) if b.rate == 0.0), None)
-    esenzione = max(esenzione, discovered_esenzione[1])
-    if esenzione is not None:
-        if imponibile <= esenzione:
-            logger.debug("Addizionale comunale: 0 (below esenzione=%.2f)", esenzione)
-            return 0.0
-        brackets.pop(discovered_esenzione[0])
-    aliquota_comunale = 0
-    remaining_imponibile = imponibile
-    for b in brackets:
-        addizionale, remaining_imponibile = b.calcola_addizionale(imponibile=imponibile, remaining_imponibile=remaining_imponibile)
-        aliquota_comunale+=addizionale
-        if remaining_imponibile <= 0:
-            break
-    return aliquota_comunale
-def _apply_brackets(brackets: list[Bracket], imponibile: float) -> float:
+
+def calcola_addizionale(ser: pd.Series | pd.DataFrame, imponibile: Decimal) -> Decimal:
+    #filtered = ser.filter(regex=r'^FASCIA|ALIQUOTA')
+    """Wrapper per il calcolo dei valori di tipo Bracket
+        Args:
+            ser: Serie da cui estrarre le informazione
+            imponibile: Valore dell'imponibile fiscale
+        Returns:
+            Decimal: Valore lordo delle detrazioni per lavoro dipendente 
     """
-    Core bracket iteration: handles esenzione check and accumulation.
-    Shared by both comunale and regionale calculations.
+    brackets = build_brackets(ser, 100)
+    return apply_brackets(brackets, imponibile)
+
+def calcolo_cuneo_fiscale(ral: Decimal, cuneo_fiscale: list[CuneoFiscale]):
     """
-    if not brackets:
-        logger.warning("No brackets found; returning 0.")
-        return 0.0
-
-    discovered_esenzione = next(
-        ((index, b.high) for index, b in enumerate(brackets) if b.rate == 0.0),
-        None
-    )
-    if discovered_esenzione is not None:
-        index, threshold = discovered_esenzione
-        if imponibile <= threshold:
-            logger.debug("Below esenzione=%.2f; returning 0.", threshold)
-            return 0.0
-        brackets.pop(index)
-
-    result = 0.0
-    remaining_imponibile = imponibile
-    for b in brackets:
-        addizionale, remaining_imponibile = b.calcola_addizionale(
-            imponibile=imponibile,
-            remaining_imponibile=remaining_imponibile,
-        )
-        result += addizionale
-        if remaining_imponibile <= 0:
-            break
-    return result
-
-
-def _calcola_addizionale_comunale(ser: pd.Series, imponibile: float) -> float:
-    filtered = ser.filter(regex=r'^FASCIA|ALIQUOTA(_[0-9]+)*')
-
-    esenzione_raw = sanitize_values(ser.get('IMPORTO_ESENTE', None))
-    try:
-        esenzione = float(esenzione_raw) if esenzione_raw is not None else None
-    except (ValueError, TypeError):
-        logger.warning("Could not parse IMPORTO_ESENTE: %r", esenzione_raw)
-        esenzione = None
-    brackets = _build_brackets(filtered, 100)
-    bracket_esenzione = next((b.high for b in brackets if b.rate == 0.0), None)
-    if esenzione is not None and bracket_esenzione is not None:
-        esenzione = max(esenzione, bracket_esenzione)
-    elif bracket_esenzione is not None:
-        esenzione = bracket_esenzione
-
-    if esenzione is not None and imponibile <= esenzione:
-        logger.debug("Addizionale comunale: 0 (below esenzione=%.2f)", esenzione)
-        return 0.0
-
-    return _apply_brackets(brackets, imponibile)
-
-
-def _calcola_addizionale_regionale(ser: pd.Series, imponibile: float) -> float:
-    filtered = ser.filter(regex=r'^FASCIA|ALIQUOTA')
-
-    if isinstance(filtered, pd.DataFrame):
-        brackets = [
-            Bracket(low=low, high=high, rate=rate / 100)
-            for _, row in filtered.iterrows()
-            for (low, high), rate in zip(
-                map(_parse_brackets_range, *_create_brackets(row)[0:1]),
-                _create_brackets(row)[1]
-            )
-        ]
-    else:
-        brackets = list(_build_brackets(filtered))
-
-    return _apply_brackets(brackets, imponibile)
-def calcolo_cuneo_fiscale(ral, cuneo_fiscale):
-    fascia_cuneo = next((f for f in cuneo_fiscale if f.low <= ral <= f.high), None)
+    Calcolo del cuneo fiscale
+    Args:
+        ral: Valore della ral
+        cuneo_fiscale: Lista delle fasce relative al cuneo fiscale
+    Returns:
+        TaxResult: Container con tutte i valori calcolati tra cui imponibile, irpef, tasse e netto annuale.
+    """
+    fascia_cuneo = next((f for f in cuneo_fiscale if f.low < ral <= f.high), None)
     if fascia_cuneo:
         return fascia_cuneo.calcolo_cuneo_fiscale(ral)
-    return 0
-#@st.cache_data        
-def calculate_net_from_ral(ral: float, months: int, comune : str, regione : str, mesi : int = 12, config_class=_default_config) -> float:
+    return Decimal()
+
+def calculate_net_from_ral(ral: Decimal, comune : str, regione : str, mesi : int = 12, config_class=_default_config) -> Decimal:
     """
-    https://www.agenziaentrate.gov.it/portale/imposta-sul-reddito-delle-persone-fisiche-irpef-/aliquote-e-calcolo-dell-irpef
-    x <= fino a euro 28.000 | 23% | 23% sull’intero importo
-
-    28.000 < x <= 50.000 | 33% | 6.440 euro + 33% sul reddito che supera i 28.000 euro fino a 50.000 euro
-
-    x > 50000 | 43% | 13.700 euro + 43% sul reddito che supera i 50.000 euro
-    Contributi INPS = 9.19%
-    :return:
+    Calcolo di netto e tasse a partire dalla ral.
+    Args:
+        ral: Valore della ral
+        comune: Comune di residenza
+        regione: Regione di residenza
+        mesi: Mensilità percepite (12-14)
+        config_class: Oggetto di configurazione necessario al calcolo, definito a partire dai .csv
+    Returns:
+        TaxResult: Container con tutte i valori calcolati tra cui imponibile, irpef, tasse e netto annuale.
     """
     cfg = config_class.dati
     
     # --- Imponibile fiscale -----------------------------------------------------
     
     cuneo = calcolo_cuneo_fiscale(ral, cfg.cuneo_fiscale)
-    contributo_inps = ral * float(cfg.contributi_dipendente.aliquota_base)
+    contributo_inps = ral * Decimal(cfg.contributi_dipendente.aliquota_base)
     imponibile_fiscale = ral - contributo_inps + cuneo
-    
+
     # --- Addizionale comune -----------------------------------------------------
     
     comuni_df = config_class.addizionali_comunali
@@ -242,7 +79,7 @@ def calculate_net_from_ral(ral: float, months: int, comune : str, regione : str,
     if matching.empty:
         raise KeyError(f"Comune '{comune}' in regione '{regione}' not found in addizionali comunali.")
     ser_comune = matching.iloc[0].dropna()
-    addizionale_comunale = _calcola_addizionale_comunale(ser_comune, imponibile_fiscale)
+    addizionale_comunale = calcola_addizionale(ser_comune, imponibile_fiscale)
  
     # --- Addizionale regionale ------------------------------------------------------
     
@@ -251,12 +88,12 @@ def calculate_net_from_ral(ral: float, months: int, comune : str, regione : str,
     except KeyError:
         raise KeyError(f"Regione '{regione}' not found in addizionali regionali.")
     ser_reg = ser_reg.dropna()
-    addizionale_regionale = _calcola_addizionale_regionale(ser_reg, imponibile_fiscale)
+    addizionale_regionale = calcola_addizionale(ser_reg, imponibile_fiscale)
     
     # --- Irpef -----------------------------------------------------
     
-    irpef_lorda = _calcola_irpef(cfg.tassazione_irpef.scaglioni, imponibile_fiscale)
-    detrazioni = _calcola_detrazioni(cfg.detrazioni, imponibile_fiscale)
+    irpef_lorda = apply_brackets(cfg.tassazione_irpef.scaglioni, imponibile_fiscale)
+    detrazioni = calcola_detrazioni(cfg.detrazioni, imponibile_fiscale)
     if detrazioni > irpef_lorda:
         detrazioni = irpef_lorda
     imposta_lorda = irpef_lorda - detrazioni + addizionale_comunale + addizionale_regionale

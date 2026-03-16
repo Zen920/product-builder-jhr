@@ -3,7 +3,8 @@ import yaml
 import pandas as pd
 import logging
 
-logger = logging.getLogger(__name__)
+import logging.config
+logger = logging.getLogger("helpers.utils")
 
 # ---------------------------------------------------------------------------
 # Constants — single source of truth for shared literals
@@ -162,11 +163,13 @@ def write_csv(
 # Data cleaning helpers
 # ---------------------------------------------------------------------------
 
-def clean_region_name(name: str) -> str | float:
+def clean_region_name(name: str) -> str:
     """
     Normalise a region name: uppercase, strip whitespace, remove 'REGIONE ' prefix.
-
-    Returns the original value unchanged if it is NaN.
+    Args:
+        name:       Name of the region to normalise.
+    Returns:
+        str:        the original value unchanged if it is NaN.
     """
     if pd.isna(name):
         return name
@@ -195,7 +198,7 @@ def clean_column(
         case:        Case-sensitive match (default False).
 
     Returns:
-        A copy of df with the column cleaned.
+        DataFrame:   A copy of df with the column cleaned.
     """
     if col not in df.columns:
         raise ValueError(f"Column '{col}' not found in DataFrame.")
@@ -216,11 +219,11 @@ def normalize_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     Uppercase and strip whitespace for each column in cols.
 
     Args:
-        df:   Source DataFrame (not mutated).
-        cols: Columns to normalise.
+        df:         Source DataFrame (not mutated).
+        cols:       Columns to normalise.
 
     Returns:
-        A copy of df with the specified columns normalised.
+        DataFrame:  A copy of df with the specified columns normalised.
     """
     missing = [c for c in cols if c not in df.columns]
     if missing:
@@ -237,11 +240,11 @@ def remove_char_from_columns(df: pd.DataFrame, cols: list[str], char: str) -> pd
     Uppercase and strip whitespace for each column in cols.
 
     Args:
-        df:   Source DataFrame (not mutated).
-        cols: Columns to normalise.
+        df:         Source DataFrame (not mutated).
+        cols:       Columns to normalise.
 
     Returns:
-        A copy of df with the specified columns normalised.
+        DataFrame:  A copy of df with the specified columns normalised.
     """
     missing = [c for c in cols if c not in df.columns]
     if missing:
@@ -332,7 +335,7 @@ def import_region_name(
         output_path: Destination file path for the merged CSV.
 
     Returns:
-        The merged DataFrame.
+        DataFrame:   The merged DataFrame.
 
     Raises:
         KeyError: If required join columns are absent.

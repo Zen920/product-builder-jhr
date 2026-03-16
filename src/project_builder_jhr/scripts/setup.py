@@ -30,15 +30,8 @@ RAW_ADD_COMUNALE = RESOURCES_DIR / "Add_comunale_irpef2025.csv"
 # Paths
 # ---------------------------------------------------------------------------
 
-"""RESOURCES_DIR = Path("resources")
-CLEANED_DIR   = RESOURCES_DIR / "cleaned"
-"""
 LOGS_DIR   = Path(get_project_root()) / "logs"
 # Raw sources
-"""RAW_ADDREG         = "addreg2026.csv"
-RAW_COMUNI         = "Elenco-comuni-italiani.csv"
-RAW_ADD_COMUNALE   = "Add_comunale_irpef2025.csv"
-"""
 
 # Cleaned outputs
 OUT_ADDREG  = CLEANED_DIR / "addizionali_regionali.csv"
@@ -52,7 +45,9 @@ REGEX_ADDIZIONALI_REGIONALI = r'(REGIONE |PROVINCIA AUTONOMA DI )+'
 # ---------------------------------------------------------------------------
 
 def setup_addizionali_regionali() -> None:
-    """Clean addreg2026.csv → cleaned/addizionali_regionali.csv."""
+    """Pulizia e normalizzazione del file addreg2026.csv.
+    Returns:
+        file: Creazione del nuovo file cleaned/addizionali_regionali.csv"""
     if OUT_ADDREG.exists():
         logger.info("'%s' already exists — skipping.", OUT_ADDREG)
         return
@@ -70,8 +65,9 @@ def setup_addizionali_regionali() -> None:
 
 def setup_elenco_comuni() -> None:
     """
-    Merge Elenco-comuni-italiani.csv + Add_comunale_irpef2025.csv
-    → cleaned/elenco_comuni.csv.
+    Unione dei file Elenco-comuni-italiani.csv + Add_comunale_irpef2025.csv
+    Returns:
+        file: cleaned/elenco_comuni.csv.
     """
     if OUT_COMUNI.exists():
         logger.info("'%s' already exists — skipping.", OUT_COMUNI)
@@ -91,9 +87,6 @@ def setup_elenco_comuni() -> None:
 
     comuni_df    = read_csv(comuni_src,   cols=None, encoding="latin-1")
     comunale_df  = read_csv(comunale_src, cols=None, encoding="latin-1")
-        #normalize_regions('Elenco-comuni-italiani.csv', ['Denominazione Regione', "Denominazione dell'Unità territoriale sovracomunale \n(valida a fini statistici)"], 'resources/elenco_comuni')
-    #import_region_name(config_class.addizionali_comunali, 
-    #config_class.comuni[['Sigla automobilistica', 'Denominazione Regione']].drop_duplicates(), 'resources/cleaned/elenco_comuni')
     merged_df = import_region_name(
         left_df=comunale_df,
         right_df=comuni_df[['Sigla automobilistica', 'Denominazione Regione']].drop_duplicates(),
@@ -109,8 +102,7 @@ def setup_elenco_comuni() -> None:
 
 def main() -> None:
     """
-    Ensure resources/cleaned/ exists and all required cleaned files are present.
-    Call this once before instantiating ConfigClass.
+    Configura l'ambiente per la corretta esecuzione dell'applicazione.
     """
     CLEANED_DIR.mkdir(parents=True, exist_ok=True)
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
