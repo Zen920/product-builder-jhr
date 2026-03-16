@@ -1,6 +1,6 @@
 [project]
 requires-python = ">= 3.13"
-name = 'project-builder-jhr'
+name = 'product-builder-jhr'
 version = "0.1"
 dependencies = ["pandas", "streamlit", "pyyaml", "pydantic", "plotly", "pytest"]
 
