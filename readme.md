@@ -25,9 +25,8 @@ conda activate ProductBuilderJHR
 
 ### 3. Install the package
 
-> **Important:** Use `python -m pip` instead of `pip` directly to ensure the correct Python environment is used.
 ```bash
-python -m pip install .
+pip install .
 ```
 
 ### 4. Run the first-launch setup
